@@ -11,7 +11,7 @@ class Dot {
     this.dead = false;
     this.fitness = 0;
     this.inputs = new double[5];
-    brain = new MultiLayerPerceptron(5, 4, 4);
+    brain = new MultiLayerPerceptron(5, 5, 4);
   }
 
   Dot(int x, int y, MultiLayerPerceptron brain) {
@@ -56,43 +56,59 @@ class Dot {
   }
 
   int searchObstRight() {
-    for (int i = this.x; i < width/nodeSize; i++) {
-      if (nodes[i][this.y].obst) {
-        return i - this.x - 1;
+    for (int i = 0; i <= 3; i++) {
+      if (this.x + i < width/nodeSize) {
+        if (nodes[this.x + i][this.y].obst) {
+          return i-1;
+        }
+      } else {
+        return width/nodeSize - this.x -1;
       }
     }
     // If there is no obstacles right
-    return width/nodeSize - this.x - 1;
+    return 3;
   }
 
   int searchObstLeft() {
-    for (int i = this.x; i > 0; i--) {
-      if (nodes[i][this.y].obst) {
-        return this.x - i - 1;
+    for (int i = 0; i <= 3; i++) {
+      if (this.x - i > 0) {
+        if (nodes[this.x - i][this.y].obst) {
+          return i-1;
+        }
+      } else {
+        return this.x;
       }
     }
     // If there is no obstacles left
-    return this.x;
+    return 3;
   }
 
   int searchObstDown() {
-    for (int i = this.y; i < height/nodeSize; i++) {
-      if (nodes[this.x][i].obst) {
-        return i - this.y - 1;
+    for (int i = 0; i <= 3; i++) {
+      if (this.y + i < height/nodeSize) {
+        if (nodes[this.x][this.y + i].obst) {
+          return i-1;
+        }
+      } else {
+        return height/nodeSize - this.y -1;
       }
     }
     // If there is no obstacles down
-    return height/nodeSize - this.y - 1;
+    return 3;
   }
 
   int searchObstUp() {
-    for (int i = this.y; i > 0; i--) {
-      if (nodes[this.x][i].obst) {
-        return this.y - i - 1;
+    for (int i = 0; i <= 3; i++) {
+      if (this.y - i > 0) {
+        if (nodes[this.x][this.y - i].obst) {
+          return i-1;
+        }
+      } else {
+        return this.y;
       }
     }
-    // If there is no obstacles left
-    return this.y;
+    // If there is no obstacles up
+    return 3;
   }
 
   // Calculating distance to target using Pitagorean way
@@ -101,6 +117,7 @@ class Dot {
     int b = targetNode.y - this.y;
     float distance = sqrt((a*a)+(b*b));
     return distance;
+    //return a+b;
   }
 
   /*------------------------------------------------------------------------------------*/
@@ -109,6 +126,7 @@ class Dot {
   // TODO: add moving and seeing crosswise
 
   void think() {
+    normalizeInputs();
     brain.setInput(inputs);
     brain.calculate();
 
@@ -128,20 +146,20 @@ class Dot {
 
   void normalizeInputs() {
     // Dist to obst right
-    inputs[0] = map(searchObstRight(), 0, width/nodeSize, 0, 1);
+    inputs[0] = map(searchObstRight(), 0, 3, 0, 1);
     // Dist to obst left
-    inputs[1] = map(searchObstLeft(), 0, width/nodeSize, 0, 1);
+    inputs[1] = map(searchObstLeft(), 0, 3, 0, 1);
     // Dist to obst down
-    inputs[2] = map(searchObstDown(), 0, height/nodeSize, 0, 1);
+    inputs[2] = map(searchObstDown(), 0, 3, 0, 1);
     // Dist to obst up
-    inputs[3] = map(searchObstUp(), 0, height/nodeSize, 0, 1);
+    inputs[3] = map(searchObstUp(), 0, 3, 0, 1);
     // Dist to target
-    inputs[4] = map(calculateDistToTarget(), 0, maxDistToTarget, 1, 0);
+    inputs[4] = map(calculateDistToTarget(), 0, maxDistToTarget, 1, -1);
   }
 
   // TOOD: maybe consider steps made
   void calculateFitness() {
-    fitness = pow(maxDistToTarget/calculateDistToTarget(), 2);
+    fitness = pow(maxDistToTarget/calculateDistToTarget(), 4);
   }
 
   void dead() {
@@ -157,15 +175,18 @@ class Dot {
       dead();
     }
 
+    if (nodes[this.x][this.y].targetNode) {
+      finish = true;
+    }
+
     if (!dead) {
-      normalizeInputs();
-      //think();
+      think();
       show();
     }
   }
 
   void show() {
-    fill(255, 200, 20);
+    fill(255, 200, 20, 20);
     ellipse(this.x*nodeSize+nodeSize/2, 
       this.y*(3/2)*nodeSize+nodeSize/2, nodeSize, nodeSize);
   }

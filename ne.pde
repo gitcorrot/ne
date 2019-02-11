@@ -1,9 +1,17 @@
+/// TODO:  2D noise map
+///        look aside for only 3 nodes
+///      !!!  fix selection
+//       !!!  normalize fitness?
+
+
 final int nodeSize = 10;
 final int nodeStartIndex = 20;
 final int nodeTargetIndexX = 77;
 final int nodeTargetIndexY = 57;
 final int nodesObstProbability = 5;
-final int populationSize = 1;
+final int populationSize = 50;
+boolean finish;
+int population;
 int time;
 float fitnessSum;
 float maxDistToTarget;
@@ -17,15 +25,17 @@ ArrayList<Dot> dotCopy;
 
 void setup() {
   // fixed framerate for constant speed of moving
-  frameRate(30);
+  frameRate(60);
   // Creating window
   size(800, 600); 
 
   // Initializing
   nodes = new Node[width/nodeSize][height/nodeSize];
-  CreateNodes();
+  createNodes();
 
   time = 0;
+  finish = false;
+  population = 1;
 
   dot = new ArrayList<Dot>();
   dotCopy = new ArrayList<Dot>();
@@ -37,7 +47,7 @@ void setup() {
 
 /*------------------------------------------------------------------------------------*/
 
-void CreateNodes() {  
+void createNodes() {  
   // TODO: Create 2d noise to generate terrain
   nodes = new Node[width/nodeSize][height/nodeSize];
   for (int i = 0; i < width/nodeSize; i++) {
@@ -66,25 +76,26 @@ void CreateNodes() {
 void draw() {
   background(64);
 
+  if (finish) noLoop();
+
   time++;
 
   // Genetic algorithm there
-  if (time > 150 || allDotsDead()) {
-    killRemainingDots();
-    calculateFitnessSum();
-  } else {
-    
-    // Visualisating nodes 
-    for (int i = 0; i < width; i += nodeSize) {
-      for (int j = 0; j < height; j += nodeSize) {
-        nodes[i/nodeSize][j/nodeSize].show();
-      }
-    }
+  if (time > 120 || allDotsDead()) {
+    newPopulation();
+    time = 0;
+  }
 
-    // Visualisating dots
-    for (int i = 0; i < dot.size(); i++) {
-      dot.get(i).update();
+  // Visualisating nodes 
+  for (int i = 0; i < width; i += nodeSize) {
+    for (int j = 0; j < height; j += nodeSize) {
+      nodes[i/nodeSize][j/nodeSize].show();
     }
+  }
+
+  // Visualisating dots
+  for (int i = 0; i < dot.size(); i++) {
+    dot.get(i).update();
   }
 }
 
@@ -101,7 +112,9 @@ void keyPressed() {
     dot.get(0).moveUp();
   if (keyCode == DOWN)
     dot.get(0).moveDown();
-  /*print("Up: " + dot.get(0).searchObstUp());
+
+  // Obstacles    
+  /* print("Up: " + dot.get(0).searchObstUp());
    println("    Down: " + dot.get(0).searchObstDown());
    print("Left: " + dot.get(0).searchObstLeft());
    println("     Right: " + dot.get(0).searchObstRight());*/
@@ -119,5 +132,6 @@ void keyPressed() {
    println("Input 4(distToTarget): " + dot.get(0).inputs[4]);*/
 
   // Fitness
-  //println("FITNESS: " + dot.get(0).fitness);
+  /*dot.get(0).calculateFitness();
+   println("FITNESS: " + dot.get(0).fitness);*/
 }
