@@ -2,28 +2,33 @@ final int nodeSize = 10;
 final int nodeStartIndex = 20;
 final int nodeTargetIndexX = 77;
 final int nodeTargetIndexY = 57;
-final int nodesObstProbability = 20;
-final int populationSize = 1500;
+final int nodesObstProbability = 5;
+final int populationSize = 1;
 float maxDistToTarget;
 Node[][] nodes;
 Node startNode;
 Node targetNode;
 ArrayList<Dot> dot;
 
+/*------------------------------------------------------------------------------------*/
+
 void setup() {
   // fixed framerate for constant speed of moving
-  frameRate(30);
+  frameRate(60);
   // Creating window
   size(800, 600); 
 
   // Initializing
   nodes = new Node[width/nodeSize][height/nodeSize];
-  dot = new ArrayList<Dot>();
-  dot.add(new Dot(nodeStartIndex, nodeStartIndex));
-
-  // Creating Node 2d array
   CreateNodes();
+  
+  dot = new ArrayList<Dot>();
+  for (int i = 0; i < populationSize; i++) {
+    dot.add(new Dot(nodeStartIndex, nodeStartIndex));
+  }
 }
+
+/*------------------------------------------------------------------------------------*/
 
 void CreateNodes() {  
   // TODO: Create 2d noise to generate terrain
@@ -34,7 +39,7 @@ void CreateNodes() {
       // Calculating obstacles
       float obstProbability = random(1) * 222;
       // Creating obstacles
-      //if (obstProbability < nodesObstProbability) nodes[i][j].obst = true;
+      if (obstProbability < nodesObstProbability) nodes[i][j].obst = true;
     }
   }
 
@@ -47,8 +52,27 @@ void CreateNodes() {
   targetNode.obst = false;
 
   maxDistToTarget = sqrt((targetNode.x*targetNode.x)+(targetNode.y*targetNode.y));
-  print(maxDistToTarget);
 }
+
+/*------------------------------------------------------------------------------------*/
+
+void draw() {
+  background(64);
+
+  // Visualisating nodes 
+  for (int i = 0; i < width; i += nodeSize) {
+    for (int j = 0; j < height; j += nodeSize) {
+      nodes[i/nodeSize][j/nodeSize].show();
+    }
+  }
+
+  // Visualisating dots
+  for (int i = 0; i < dot.size(); i++) {
+    dot.get(i).update();
+  }
+}
+
+/*------------------------------------------------------------------------------------*/
 
 // Debugging function 
 void keyPressed() {
@@ -67,36 +91,14 @@ void keyPressed() {
    println("     Right: " + dot.get(0).searchObstRight());*/
 
   // Distance
-  dot.get(0).calculateDistToTarget();
-  //println(dot.get(0).calculateDistToTarget());
+ /* dot.get(0).calculateDistToTarget();
+  println(dot.get(0).calculateDistToTarget());*/
 
   // MLP
-  /*dot.get(0).normalizeInputs();
-  println("Input 0(right): " + dot.get(0).inputs[0]);
-  println("Input 1(left): " + dot.get(0).inputs[1]);
-  println("Input 2(down): " + dot.get(0).inputs[2]);
-  println("Input 3(up): " + dot.get(0).inputs[3]);
-  println("Input 4(distToTarget): " + dot.get(0).inputs[4]);*/
-}
-
-// a
-void draw() {
-  background(64);
-
-  // Visualisating nodes 
-  for (int i = 0; i < width; i += nodeSize) {
-    for (int j = 0; j < height; j += nodeSize) {
-      nodes[i/nodeSize][j/nodeSize].show();
-    }
-  }
-
-  // Visualisating dots
-  for (int i = 0; i < dot.size(); i++) {
-    dot.get(i).update();
-    if (dot.get(i).dead) {
-      // do something
-    } else {    
-      dot.get(i).show();
-    }
-  }
+   /*dot.get(0).normalizeInputs();
+   println("Input 0(right): " + dot.get(0).inputs[0]);
+   println("Input 1(left): " + dot.get(0).inputs[1]);
+   println("Input 2(down): " + dot.get(0).inputs[2]);
+   println("Input 3(up): " + dot.get(0).inputs[3]);
+   println("Input 4(distToTarget): " + dot.get(0).inputs[4]);*/
 }

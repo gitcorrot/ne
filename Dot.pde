@@ -19,6 +19,8 @@ class Dot {
     this.brain = brain;
   }
 
+  /*------------------------------------------------------------------------------------*/
+
   // Moving stuff
   void moveUp() {
     if (this.y > 0)
@@ -97,7 +99,28 @@ class Dot {
     return distance;
   }
 
+  /*------------------------------------------------------------------------------------*/
+
   // MLP stuff
+  // TODO: add moving and seeing crosswise
+
+  void think() {
+    brain.setInput(inputs);
+    brain.calculate();
+
+    if (brain.getOutput()[0] > 0.50) {
+      moveUp();
+    }
+    if (brain.getOutput()[1] > 0.50) {
+      moveDown();
+    }
+    if (brain.getOutput()[2] > 0.50) {
+      moveLeft();
+    }
+    if (brain.getOutput()[3] > 0.50) {
+      moveRight();
+    }
+  }
 
   void normalizeInputs() {
     // Dist to obst right
@@ -112,11 +135,21 @@ class Dot {
     inputs[4] = map(calculateDistToTarget(), 0, maxDistToTarget, 1, 0);
   }
 
+  void calculateFitness() {
+    fitness = calculateDistToTarget();
+  }
+
+  /*------------------------------------------------------------------------------------*/
+
   void update() {
-    normalizeInputs();
-    
     if (nodes[this.x][this.y].obst) {
       dead = true;
+    }
+
+    if (!dead) {
+      normalizeInputs();
+      //think();
+      show();
     }
   }
 
