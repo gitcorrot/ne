@@ -1,6 +1,6 @@
 class Dot {
   int x, y;
-  boolean dead = false;
+  boolean dead;
   float fitness;
   double inputs[];
   MultiLayerPerceptron brain;
@@ -8,6 +8,8 @@ class Dot {
   Dot(int x, int y) {
     this.x = x;
     this.y = y;
+    this.dead = false;
+    this.fitness = 0;
     this.inputs = new double[5];
     brain = new MultiLayerPerceptron(5, 4, 4);
   }
@@ -15,6 +17,8 @@ class Dot {
   Dot(int x, int y, MultiLayerPerceptron brain) {
     this.x = x;
     this.y = y;
+    this.dead = false;
+    this.fitness = 0;
     this.inputs = new double[5];
     this.brain = brain;
   }
@@ -26,28 +30,28 @@ class Dot {
     if (this.y > 0)
       this.y -= 1;
     else {
-      dead = true;
+      dead();
     }
   }
   void moveDown() {
     if (this.y < height/nodeSize-1)
       this.y += 1;
     else {
-      dead = true;
+      dead();
     }
   }
   void moveLeft() {
     if (this.x > 0)
       this.x -= 1;
     else {
-      dead = true;
+      dead();
     }
   }
   void moveRight() {
     if (this.x < width/nodeSize-1)
       this.x += 1;
     else {
-      dead = true;
+      dead();
     }
   }
 
@@ -140,13 +144,17 @@ class Dot {
     fitness = pow(maxDistToTarget/calculateDistToTarget(), 2);
   }
 
+  void dead() {
+    dead = true;
+    calculateFitness();
+    dotCopy.add(this);
+  }
+
   /*------------------------------------------------------------------------------------*/
 
   void update() {
     if (nodes[this.x][this.y].obst && !dead) {
-      dead = true;
-      dotCopy.add(this);
-      print(dotCopy.size());
+      dead();
     }
 
     if (!dead) {

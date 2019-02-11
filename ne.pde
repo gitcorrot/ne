@@ -4,6 +4,7 @@ final int nodeTargetIndexX = 77;
 final int nodeTargetIndexY = 57;
 final int nodesObstProbability = 5;
 final int populationSize = 1;
+int time;
 float fitnessSum;
 float maxDistToTarget;
 Node[][] nodes;
@@ -16,7 +17,7 @@ ArrayList<Dot> dotCopy;
 
 void setup() {
   // fixed framerate for constant speed of moving
-  frameRate(60);
+  frameRate(30);
   // Creating window
   size(800, 600); 
 
@@ -24,9 +25,11 @@ void setup() {
   nodes = new Node[width/nodeSize][height/nodeSize];
   CreateNodes();
 
+  time = 0;
+
   dot = new ArrayList<Dot>();
   dotCopy = new ArrayList<Dot>();
-  
+
   for (int i = 0; i < populationSize; i++) {
     dot.add(new Dot(nodeStartIndex, nodeStartIndex));
   }
@@ -63,16 +66,25 @@ void CreateNodes() {
 void draw() {
   background(64);
 
-  // Visualisating nodes 
-  for (int i = 0; i < width; i += nodeSize) {
-    for (int j = 0; j < height; j += nodeSize) {
-      nodes[i/nodeSize][j/nodeSize].show();
-    }
-  }
+  time++;
 
-  // Visualisating dots
-  for (int i = 0; i < dot.size(); i++) {
-    dot.get(i).update();
+  // Genetic algorithm there
+  if (time > 150 || allDotsDead()) {
+    killRemainingDots();
+    calculateFitnessSum();
+  } else {
+    
+    // Visualisating nodes 
+    for (int i = 0; i < width; i += nodeSize) {
+      for (int j = 0; j < height; j += nodeSize) {
+        nodes[i/nodeSize][j/nodeSize].show();
+      }
+    }
+
+    // Visualisating dots
+    for (int i = 0; i < dot.size(); i++) {
+      dot.get(i).update();
+    }
   }
 }
 
