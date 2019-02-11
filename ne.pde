@@ -71,8 +71,12 @@ void keyPressed() {
   //println(dot.get(0).calculateDistToTarget());
 
   // MLP
-  dot.get(0).normalizeInputs();
-  println(dot.get(0).inputs[4]);
+  /*dot.get(0).normalizeInputs();
+  println("Input 0(right): " + dot.get(0).inputs[0]);
+  println("Input 1(left): " + dot.get(0).inputs[1]);
+  println("Input 2(down): " + dot.get(0).inputs[2]);
+  println("Input 3(up): " + dot.get(0).inputs[3]);
+  println("Input 4(distToTarget): " + dot.get(0).inputs[4]);*/
 }
 
 // a

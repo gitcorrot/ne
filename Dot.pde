@@ -113,6 +113,8 @@ class Dot {
   }
 
   void update() {
+    normalizeInputs();
+    
     if (nodes[this.x][this.y].obst) {
       dead = true;
     }
