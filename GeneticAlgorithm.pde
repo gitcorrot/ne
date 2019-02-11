@@ -1,3 +1,22 @@
+void newPopulation() {
+  population++;
+  println("New population! It's " + population);
+
+  killRemainingDots();
+  calculateFitnessSum();
+
+  dot = new ArrayList<Dot>();
+
+  for (int i = 0; i < dotCopy.size(); i++) {
+    dot.add(selection());
+  }
+
+  println("New dot size : " + dot.size());
+  
+  dotCopy = new ArrayList<Dot>();
+  createNodes();
+}
+
 // Roulette Wheel Selection
 Dot selection() {
   float r = random(fitnessSum);
@@ -5,10 +24,17 @@ Dot selection() {
   for (int i = 0; i < dotCopy.size(); i++) {
     sum += dotCopy.get(i).fitness;
     if (sum > r) {
-      return dotCopy.get(i);
+      Dot child = new Dot(nodeStartIndex, nodeStartIndex, 
+        dotCopy.get(i).brain);
+
+      if (random(1) < 0.01) {
+        child.brain.randomizeWeights(); 
+        println("MUTATION");
+      }
+
+      return child;
     }
   }
-  
   // It should never get beneath
   print("Error while selection!"); 
   return new Dot(nodeStartIndex, nodeStartIndex);
