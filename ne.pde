@@ -4,11 +4,13 @@ final int nodeTargetIndexX = 77;
 final int nodeTargetIndexY = 57;
 final int nodesObstProbability = 5;
 final int populationSize = 1;
+float fitnessSum;
 float maxDistToTarget;
 Node[][] nodes;
 Node startNode;
 Node targetNode;
 ArrayList<Dot> dot;
+ArrayList<Dot> dotCopy;
 
 /*------------------------------------------------------------------------------------*/
 
@@ -21,8 +23,10 @@ void setup() {
   // Initializing
   nodes = new Node[width/nodeSize][height/nodeSize];
   CreateNodes();
-  
+
   dot = new ArrayList<Dot>();
+  dotCopy = new ArrayList<Dot>();
+  
   for (int i = 0; i < populationSize; i++) {
     dot.add(new Dot(nodeStartIndex, nodeStartIndex));
   }
@@ -91,14 +95,17 @@ void keyPressed() {
    println("     Right: " + dot.get(0).searchObstRight());*/
 
   // Distance
- /* dot.get(0).calculateDistToTarget();
-  println(dot.get(0).calculateDistToTarget());*/
+  /* dot.get(0).calculateDistToTarget();
+   println(dot.get(0).calculateDistToTarget());*/
 
   // MLP
-   /*dot.get(0).normalizeInputs();
+  /*dot.get(0).normalizeInputs();
    println("Input 0(right): " + dot.get(0).inputs[0]);
    println("Input 1(left): " + dot.get(0).inputs[1]);
    println("Input 2(down): " + dot.get(0).inputs[2]);
    println("Input 3(up): " + dot.get(0).inputs[3]);
    println("Input 4(distToTarget): " + dot.get(0).inputs[4]);*/
+
+  // Fitness
+  //println("FITNESS: " + dot.get(0).fitness);
 }

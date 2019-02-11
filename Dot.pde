@@ -1,7 +1,7 @@
 class Dot {
   int x, y;
-  float fitness;
   boolean dead = false;
+  float fitness;
   double inputs[];
   MultiLayerPerceptron brain;
 
@@ -135,15 +135,18 @@ class Dot {
     inputs[4] = map(calculateDistToTarget(), 0, maxDistToTarget, 1, 0);
   }
 
+  // TOOD: maybe consider steps made
   void calculateFitness() {
-    fitness = calculateDistToTarget();
+    fitness = pow(maxDistToTarget/calculateDistToTarget(), 2);
   }
 
   /*------------------------------------------------------------------------------------*/
 
   void update() {
-    if (nodes[this.x][this.y].obst) {
+    if (nodes[this.x][this.y].obst && !dead) {
       dead = true;
+      dotCopy.add(this);
+      print(dotCopy.size());
     }
 
     if (!dead) {
