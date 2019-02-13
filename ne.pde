@@ -1,15 +1,17 @@
 /// TODO:  2D noise map
-///        look aside for only 3 nodes
-///      !!!  fix selection
-//       !!!  normalize fitness?
+///        refactor looking aside for only 3 
+///        nodes to look to first obstacle
+
+///      !!!  too low influence on output :(
 
 
 final int nodeSize = 10;
-final int nodeStartIndex = 20;
-final int nodeTargetIndexX = 77;
-final int nodeTargetIndexY = 57;
-final int nodesObstProbability = 5;
-final int populationSize = 50;
+final int nodeStartIndex = 30;
+ int nodeTargetIndexX = 55;
+ int nodeTargetIndexY = 45;
+final int nodesObstProbability = 40;
+final int populationSize = 1;
+final float mutationRate = 0.01;  // 10%
 boolean finish;
 int population;
 int time;
@@ -25,7 +27,7 @@ ArrayList<Dot> dotCopy;
 
 void setup() {
   // fixed framerate for constant speed of moving
-  frameRate(60);
+  frameRate(10);
   // Creating window
   size(800, 600); 
 
@@ -48,16 +50,26 @@ void setup() {
 /*------------------------------------------------------------------------------------*/
 
 void createNodes() {  
-  // TODO: Create 2d noise to generate terrain
+  float ioff = 0;
+  float joff = 0;
+  
+  //nodeTargetIndexX = floor(random(2, 77));
+  //nodeTargetIndexY= floor(random(2, 57));
+
+  noiseSeed(int(random(1000)));
+
   nodes = new Node[width/nodeSize][height/nodeSize];
   for (int i = 0; i < width/nodeSize; i++) {
     for (int j = 0; j < height/nodeSize; j++) {
       nodes[i][j] = new Node(i, j);
       // Calculating obstacles
-      float obstProbability = random(1) * 222;
+      float obstProbability = noise(joff, ioff) * 105;
       // Creating obstacles
       if (obstProbability < nodesObstProbability) nodes[i][j].obst = true;
+      joff += 0.2;
     }
+    ioff += 0.2;
+    joff = 0;
   }
 
   // Starting and target node coordinates
@@ -76,12 +88,12 @@ void createNodes() {
 void draw() {
   background(64);
 
-  if (finish) noLoop();
+  //if (finish) noLoop();
 
-  time++;
+  //time++;
 
   // Genetic algorithm there
-  if (time > 120 || allDotsDead()) {
+  if (time > 40 || allDotsDead()) {
     newPopulation();
     time = 0;
   }
@@ -103,6 +115,7 @@ void draw() {
 
 // Debugging function 
 void keyPressed() {
+  println(dot.get(0).brain.getWeights().length);
   // Moving and dist to obstacle
   if (keyCode == RIGHT)
     dot.get(0).moveRight();
@@ -120,18 +133,19 @@ void keyPressed() {
    println("     Right: " + dot.get(0).searchObstRight());*/
 
   // Distance
-  /* dot.get(0).calculateDistToTarget();
+  /*dot.get(0).calculateDistToTarget();
    println(dot.get(0).calculateDistToTarget());*/
 
   // MLP
-  /*dot.get(0).normalizeInputs();
+  dot.get(0).normalizeInputs();
    println("Input 0(right): " + dot.get(0).inputs[0]);
    println("Input 1(left): " + dot.get(0).inputs[1]);
    println("Input 2(down): " + dot.get(0).inputs[2]);
    println("Input 3(up): " + dot.get(0).inputs[3]);
-   println("Input 4(distToTarget): " + dot.get(0).inputs[4]);*/
+   println("Input 4(distToTarget): " + dot.get(0).inputs[4]);
 
   // Fitness
   /*dot.get(0).calculateFitness();
-   println("FITNESS: " + dot.get(0).fitness);*/
+   println("FITNESS: " + dot.get(0).fitness);
+   println("dist to target: " + dot.get(0).calculateDistToTarget());*/
 }

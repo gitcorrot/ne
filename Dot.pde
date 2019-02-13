@@ -1,7 +1,8 @@
 class Dot {
   int x, y;
   boolean dead;
-  float fitness;
+  boolean success;
+  double fitness;
   double inputs[];
   MultiLayerPerceptron brain;
 
@@ -9,15 +10,17 @@ class Dot {
     this.x = x;
     this.y = y;
     this.dead = false;
+    this.success = false;
     this.fitness = 0;
     this.inputs = new double[5];
-    brain = new MultiLayerPerceptron(5, 5, 4);
+    brain = new MultiLayerPerceptron(5, 4, 4);
   }
 
   Dot(int x, int y, MultiLayerPerceptron brain) {
     this.x = x;
     this.y = y;
     this.dead = false;
+    this.success = false;
     this.fitness = 0;
     this.inputs = new double[5];
     this.brain = brain;
@@ -116,7 +119,7 @@ class Dot {
     int a = targetNode.x - this.x;
     int b = targetNode.y - this.y;
     float distance = sqrt((a*a)+(b*b));
-    return distance;
+    return map(distance, 0, maxDistToTarget, 0, 100);
     //return a+b;
   }
 
@@ -126,21 +129,30 @@ class Dot {
   // TODO: add moving and seeing crosswise
 
   void think() {
-    normalizeInputs();
-    brain.setInput(inputs);
-    brain.calculate();
+    if (!success) {
 
-    if (brain.getOutput()[0] > 0.50) {
-      moveUp();
-    }
-    if (brain.getOutput()[1] > 0.50) {
-      moveDown();
-    }
-    if (brain.getOutput()[2] > 0.50) {
-      moveLeft();
-    }
-    if (brain.getOutput()[3] > 0.50) {
-      moveRight();
+      normalizeInputs();
+      brain.setInput(inputs);
+      brain.calculate();
+
+      println("Output 0 : " + brain.getOutput()[0]);
+      println("Output 1 : " + brain.getOutput()[1]);
+      println("Output 2 : " + brain.getOutput()[2]);
+      println("Output 3 : " + brain.getOutput()[3]);
+      println("-------------------------------------------");
+      
+      /*if (brain.getOutput()[0] > 0.50) {
+        moveUp();
+      }
+      if (brain.getOutput()[1] > 0.50) {
+        moveDown();
+      }
+      if (brain.getOutput()[2] > 0.50) {
+        moveLeft();
+      }
+      if (brain.getOutput()[3] > 0.50) {
+        moveRight();
+      }*/
     }
   }
 
@@ -154,29 +166,41 @@ class Dot {
     // Dist to obst up
     inputs[3] = map(searchObstUp(), 0, 3, 0, 1);
     // Dist to target
-    inputs[4] = map(calculateDistToTarget(), 0, maxDistToTarget, 1, -1);
+    inputs[4] = map(calculateDistToTarget(), 0, maxDistToTarget, 0, 1);
   }
 
   // TOOD: maybe consider steps made
   void calculateFitness() {
-    fitness = pow(maxDistToTarget/calculateDistToTarget(), 4);
+    if (success) {
+      fitness = 9999;
+    } else {
+      //if(calculateDistToTarget() 
+      fitness = pow(maxDistToTarget/(calculateDistToTarget()+1), 2);
+    }
   }
 
   void dead() {
     dead = true;
     calculateFitness();
-    dotCopy.add(this);
+
+    if (!dotCopy.contains(this)) {
+      dotCopy.add(this);
+    }
   }
 
   /*------------------------------------------------------------------------------------*/
 
   void update() {
-    if (nodes[this.x][this.y].obst && !dead) {
-      dead();
-    }
 
     if (nodes[this.x][this.y].targetNode) {
-      finish = true;
+      //finish = true;
+      success = true;
+      calculateFitness();
+    }
+
+    if (nodes[this.x][this.y].obst && !dead) {
+      dead();
+      //this.fitness /= 2;
     }
 
     if (!dead) {
